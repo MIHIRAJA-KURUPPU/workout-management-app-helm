@@ -1,6 +1,6 @@
 # Setting Up Minikube with PostgreSQL and Web Application Using Helm
 
-This guide provides instructions for setting up a Kubernetes cluster using Minikube, deploying PostgreSQL with persistent storage, and workout management web application using Helm which is a package manager for Kubernetes.
+This guide provides instructions for setting up a Kubernetes cluster using Minikube, deploying PostgreSQL with persistent storage, and workout management web application using Helm which is a package manager for Kubernetes.  This repository contains the Helm chart for deploying the `workout-app` in a Kubernetes environment. It includes the necessary templates for Kubernetes resources like Deployment, StatefulSet, Service, PVC, Secrets, and more.
 
 ---
 
@@ -93,5 +93,24 @@ Encode Secrets: If you're using the encode-secrets.sh script to encode secrets f
 
 This will output the base64-encoded secret that you can use in your postgres-secret.yaml.
 
+## Workout App Helm Chart
 
+### 1. Create the Helm Chart
+
+Create a Helm chart named `workout-app` in your project directory. 
+
+- Replace the `templates/` directory with the required Kubernetes resource files, such as `deployment.yaml`, `statefulset.yaml`, `service.yaml`, `pvc.yaml`, `secrets.yaml`, and other necessary files.
+- Update the `helpers.tpl` file to include functions that dynamically generate useful names.
+- Modify `values.yaml` to define application-specific configurations like database details, image settings, and replica counts.
+
+### 2. Deploy or Upgrade the Application
+
+To install or upgrade the `workout-app` release, run the following command:
+
+```bash
+helm upgrade --install workout-app . --namespace workout-app-ns1 --create-namespace
+```
+
+The --create-namespace flag will ensure that the namespace workout-app-ns1 is created if it does not already exist.
+This command will install the workout-app release or upgrade it if it's already installed.
 
