@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "workout-app.fullname" . }}-configmap
+  labels:
+    {{- include "workout-app.labels" . | nindent 4 }}
+data:
+  POSTGRES_USER: {{ .Values.postgresConfig.user | default "postgres" }}
+  POSTGRES_DB: {{ .Values.postgresConfig.db | default "workout" }}

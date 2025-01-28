@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "workout-app.fullname" . }}-image-storage-pvc
+  labels:
+    {{- include "workout-app.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.imageStoragePersistentVolumeClaim.accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .Values.imageStoragePersistentVolumeClaim.capacity | default "5Gi" }}
+  storageClassName: {{ .Values.imageStoragePersistentVolumeClaim.storageClass | default "standard" }}
+  volumeName: {{ .Values.imageStoragePersistentVolumeClaim.volumeName | default (printf "%s-image-storage-pv" (include "workout-app.fullname" .)) }}
+
+

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "workout-app.fullname" . }}-postgres
+  labels:
+    app: postgres
+spec:
+  replicas: {{ .Values.postgres.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: {{ include "workout-app.fullname" . }}-postgres-headless
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag | default "15.0" }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "workout-app.fullname" . }}-postgres-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "workout-app.fullname" . }}-postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom: 
+                configMapKeyRef:
+                  name: {{ include "workout-app.fullname" . }}-configmap
+                  key: POSTGRES_DB
+
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes:
+          - {{ .Values.postgres.storage.accessMode | default "ReadWriteMany" }}
+        resources:
+          requests:
+            storage: {{ .Values.postgres.storage.size | default "10Gi" }}
+        storageClassName: {{ .Values.postgres.storage.storageClass | default "standard" }}
