@@ -7,9 +7,6 @@
 *.env
 *.json
 
-# Ignore secret Kubernetes YAML files
-templates/secret.yaml
-
 # Ignore compiled output or temporary files
 *.out
 *.tmp
