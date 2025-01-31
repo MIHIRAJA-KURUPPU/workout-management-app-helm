@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "workout-app.fullname" . }}-postgres
+  name: {{ include "workout-management-app.fullname" . }}-postgres
   labels:
-    app: postgres
+    {{- include "workout-management-app.postgresLabels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.postgres.replicas | default 1 }}
+  replicas: {{ .Values.postgres.replicas}}
   selector:
     matchLabels:
-      app: postgres
-  serviceName: {{ include "workout-app.fullname" . }}-postgres-headless
+      {{- include "workout-management-app.postgresSelectorLabels" . | nindent 6 }}
+  serviceName: {{ include "workout-management-app.fullname" . }}-postgres-headless
   template:
     metadata:
       labels:
-        app: postgres
+        {{- include "workout-management-app.postgresLabels" . | nindent 8 }}
     spec:
       containers:
         - name: postgres
@@ -21,23 +21,23 @@ spec:
           env:
             - name: POSTGRES_USER
               valueFrom:
-                secretKeyRef:
-                  name: {{ include "workout-app.fullname" . }}-postgres-secret
+                configMapKeyRef:
+                  name: {{ include "workout-management-app.fullname" . }}-postgres-configmap
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "workout-app.fullname" . }}-postgres-secret
+                  name: {{ include "workout-management-app.fullname" . }}-postgres-secret
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               valueFrom: 
                 configMapKeyRef:
-                  name: {{ include "workout-app.fullname" . }}-configmap
+                  name: {{ include "workout-management-app.fullname" . }}-postgres-configmap
                   key: POSTGRES_DB
 
           volumeMounts:
             - name: postgres-storage
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql/data6
   volumeClaimTemplates:
     - metadata:
         name: postgres-storage

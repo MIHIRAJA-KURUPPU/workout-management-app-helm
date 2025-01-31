@@ -1,8 +1,7 @@
-# Default values for workout-app.
+# Default values for workout-management-app.
 
 
 replicaCount: 3
-
 
 image:
   registry: docker.io
@@ -104,7 +103,7 @@ autoscaling:
 volumes:
  - name: image-storage
    persistentVolumeClaim:
-     claimName: workout-app-image-storage-pvc
+     claimName: workout-management-app-image-storage-pvc
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
@@ -147,11 +146,6 @@ service:
 
 
 
-postgresConfig:
-  user: "postgres"
-  db: "workout"
-
-
 postgres:
   replicas: 1
   image:
@@ -163,18 +157,28 @@ postgres:
     accessMode: ReadWriteMany
     size: 10Gi
     storageClass: standard
+  #auth:
+    #password: "20010209"
+
+postgresConfig:
+  user: postgres
+  db: workout
 
 
-
-imageStoragePersistentVolume:
+PersistentVolume:
   capacity: 5Gi
   accessMode: ReadWriteMany
   storageClass: standard
   hostPath: /mnt/data/images
 
 
-imageStoragePersistentVolumeClaim:
+PersistentVolumeClaim:
   accessMode: ReadWriteMany
   capacity: 5Gi
   storageClass: standard
   volumeName: ""
+
+
+#appuser:
+  #username: postgres
+  #userpassword: "20010209"
