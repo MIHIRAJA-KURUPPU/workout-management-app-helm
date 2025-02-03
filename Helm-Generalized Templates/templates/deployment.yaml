@@ -86,8 +86,7 @@ spec:
                 secretKeyRef:
                   name: {{ $.Release.Name }}-{{ index $.Values.secret 1 "name" }}-secret
                   key: {{ index .Values.secret 1 "key" }}
-            - name: USER_NAME
-            #{{ index $.Values.statefulset 0 "userKey" }}
+            - name: {{ index $.Values.statefulset 0 "userKey" }}
               valueFrom:
                 configMapKeyRef:
                   name: {{ $.Release.Name }}-{{ index $.Values.configMap 0 "name" }}-configmap
@@ -99,10 +98,10 @@ spec:
                   key: {{ index $.Values.configMap 0 "db" "dbKey" }}
 
             - name: DATABASE_URL
-              value: "postgresql://postgres:20010209@postgres-service:5432/workout"
-              #{{ index $.Values.statefulset 0 "database-protocol" }}$(USER_NAME)
-              #${{ index $.Values.statefulset 0 "userKey" }}
+              value: {{ index $.Values.statefulset 0 "database-protocol" }}$({{ index $.Values.statefulset 0 "userKey" }}):$({{ index .Values.statefulset 0 "passKey" }})@{{index $.Values.service 1 "name"}}:{{index $.Values.service 1 "port"}}/$({{ index $.Values.statefulset 0  "dbKey" }})
+              #{{ index $.Values.statefulset 0 "database-protocol" }}$(USER_NAME):$(PASSWORD)@{{index $.Values.service 1 "name"}}:{{index $.Values.service 1 "port"}}/$(DATABASE_NAME)
               #"postgresql://postgres:20010209@postgres-service:5432/workout"
+
 
               
 

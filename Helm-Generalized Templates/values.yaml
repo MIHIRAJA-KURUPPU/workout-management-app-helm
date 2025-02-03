@@ -15,7 +15,6 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag:  latest
 
-
 containerPort:
   port: 5000
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -125,6 +124,11 @@ tolerations: []
 
 affinity: {}
 
+labels:
+  app: workout-app
+
+selectorLabels:
+  app: workout-app
 
 service:
   - name: webapp-service
@@ -135,33 +139,18 @@ service:
     protocol: TCP
     labels:
       app: workout-app
-      #environment: production
-      #tier: backend
     selectorLabels:
       app: workout-app
-      #tier: backend
 
   - name: postgres-service
     type: ClusterIP
     port: 5432
     targetPort: 5432
     protocol: TCP
+    labels:
+      app: postgres
     selectorLabels:
       app: postgres
-      #tier: backend
-
-
-labels:
-  app: workout-app
-  #environment: production
-
-
-
-selectorLabels:
-  app: workout-app
-  #environment: production
-
-
 
 statefulset:
   - name: "postgres"
@@ -174,43 +163,29 @@ statefulset:
     image:
       repository: "postgres"
     imagetag: "15"
-    user:
-      userPassword: "20010209"
-    auth:
-      password: "POSTGRES_PASSWORD"
     volume:
       name: "database-storage"
       accessMode: ReadWriteMany
       size: "5Gi"
       storageClass: "standard"
-      mountPath: "/var/lib/postgresql/data8"
+      mountPath: "/var/lib/postgresql/data"
     userKey: "USER_NAME"
     dbKey: "DATABASE_NAME"
     passKey: "PASSWORD"
 
-
-
 configMap:
   - user:
       userKey: "POSTGRES_USER"
-      userName: postgres
     db:
       dbKey: "POSTGRES_DB"
-      dbName: workout
     name: postgres
  
-
 secret:
   - name: postgres
     key: "POSTGRES_PASSWORD" 
-    value: "20010209"
 
   - name: web-app
     key: "USER_PASSWORD" 
-    value: "20010209"
-
-  
-
 
 persistentVolume:
   - name: "image-storage-pv"
@@ -225,20 +200,6 @@ persistentVolume:
     labels:
       app: workout-app
 
-#  - name: "postgres-pv"
-#    capacity: "10Gi"
-#    volumeMode: "Filesystem"
-#    accessModes:
-#      - "ReadWriteMany"
-#    reclaimPolicy: "Retain"
-#    storageClass: "standard"
-#    hostPath: "/mnt/data/postgres"  
-#    type: "DirectoryOrCreate"
-#    labels:
-#      app: "postgres"
-
-
-
 persistentVolumeClaim:
   - name: image-storage-claim
     labels:
@@ -249,11 +210,4 @@ persistentVolumeClaim:
     storageClass: "standard"
     volumeName: image-storage-pv
 
-#  - name: database-storage-postgres-statefulset-0
-#    labels:
-#      app: "postgres"
-#    accessModes:
-#      - "ReadWriteMany"
-#    capacity: "10Gi"
-#    storageClass: "standard"
-#    volumeName: postgres-pv
+
