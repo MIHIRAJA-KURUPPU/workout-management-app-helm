@@ -4,12 +4,12 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{.name}}-statefulset
-
+ 
   {{- if .labels }}
   labels:
     {{- toYaml .labels | nindent 4 }}
   {{- end }}
-
+ 
 spec:
   replicas: {{ .replicas }}
   selector:
@@ -46,7 +46,7 @@ spec:
           volumeMounts:
             - name: {{ .volume.name }}
               mountPath: {{ .volume.mountPath }}
-
+ 
   volumeClaimTemplates:
     - metadata:
         name: {{ .volume.name }}

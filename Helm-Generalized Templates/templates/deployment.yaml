@@ -2,12 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}
-  
   {{- if .Values.labels }}
   labels:
     {{- toYaml .Values.labels | nindent 4 }}
   {{- end }}
-
+ 
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -17,14 +16,14 @@ spec:
     matchLabels:
       {{- toYaml .Values.selectorLabels | nindent 6 }}
     {{- end }}
-
+ 
   template:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+ 
       {{- if .Values.selectorLabels }}
       labels:
         {{- toYaml .Values.selectorLabels | nindent 8 }}
@@ -34,44 +33,44 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+ 
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+ 
       containers:
         - name: {{ .Chart.Name }}
-
+ 
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-
+ 
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-
+ 
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-
+ 
           ports:
             - name: http
               containerPort: {{ .Values.containerPort.port }}
-
-
+ 
+ 
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-
+ 
           {{- with .Values.readinessProbe }}
           readinessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-
+ 
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-
+ 
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- range . }}
@@ -79,7 +78,7 @@ spec:
               mountPath: {{ .mountPath }}
             {{- end }}
           {{- end }}
-
+ 
           env:
             - name: {{ index .Values.statefulset 0 "passKey" }}
               valueFrom:
@@ -96,30 +95,26 @@ spec:
                 configMapKeyRef:
                   name:  {{ $.Release.Name }}-{{ index $.Values.configMap 0 "name" }}-configmap
                   key: {{ index $.Values.configMap 0 "db" "dbKey" }}
-
+ 
             - name: DATABASE_URL
               value: {{ index $.Values.statefulset 0 "database-protocol" }}$({{ index $.Values.statefulset 0 "userKey" }}):$({{ index .Values.statefulset 0 "passKey" }})@{{index $.Values.service 1 "name"}}:{{index $.Values.service 1 "port"}}/$({{ index $.Values.statefulset 0  "dbKey" }})
-              #{{ index $.Values.statefulset 0 "database-protocol" }}$(USER_NAME):$(PASSWORD)@{{index $.Values.service 1 "name"}}:{{index $.Values.service 1 "port"}}/$(DATABASE_NAME)
-              #"postgresql://postgres:20010209@postgres-service:5432/workout"
-
 
               
-
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+ 
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+ 
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+ 
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
