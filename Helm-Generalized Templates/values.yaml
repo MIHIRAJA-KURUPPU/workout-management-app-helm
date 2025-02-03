@@ -189,7 +189,7 @@ secret:
 
 persistentVolume:
   - name: "image-storage-pv"
-    capacity: "10Gi"  
+    capacity: "5Gi"  
     volumeMode: "Filesystem"
     accessModes:
       - "ReadWriteMany"
@@ -199,6 +199,9 @@ persistentVolume:
     type: "DirectoryOrCreate"
     labels:
       app: workout-app
+    annotations:
+      enabled: true
+      policy: "keep"     
 
 persistentVolumeClaim:
   - name: image-storage-claim
@@ -206,8 +209,12 @@ persistentVolumeClaim:
       app: workout-app
     accessModes:
       - "ReadWriteMany"
-    capacity: "10Gi"
+    capacity: "5Gi"
     storageClass: "standard"
     volumeName: image-storage-pv
+    annotations:
+      enabled: true
+      policy: "keep"
+
 
 

@@ -10,6 +10,11 @@ metadata:
     {{- toYaml .labels | nindent 4 }}
   {{- end }}
 
+  annotations:
+    {{- if .annotations.enabled }}
+    helm.sh/resource-policy: {{ .annotations.policy | quote }}
+    {{- end }}
+
 spec:
   capacity:
     storage: {{ .capacity | quote }}  
