@@ -1,0 +1,32 @@
+{{- range .Values.persistentVolume }}
+---
+
+apiVersion: v1
+kind: PersistentVolume
+
+metadata:
+  name: {{ .name }}
+
+  {{- if .labels }}
+  labels:
+    {{- toYaml .labels | nindent 4 }}
+  {{- end }}
+
+spec:
+  capacity:
+    storage: {{ .capacity | quote }}  
+  volumeMode: {{ .volumeMode | default "Filesystem" }} 
+  accessModes:
+    {{- range .accessModes }}
+    - {{ . | default "ReadWriteMany" }}
+    {{- end }}
+  persistentVolumeReclaimPolicy: {{ .reclaimPolicy | default "Retain" }} 
+  storageClassName: {{ .storageClass | default "standard" }} 
+
+  {{- if .hostPath }}  
+  hostPath:
+    path: {{ .hostPath | quote }}  
+    type: {{ .type | default "DirectoryOrCreate" }}  
+  {{- end }}
+
+{{- end }}

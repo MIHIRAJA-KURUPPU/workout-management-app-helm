@@ -1,0 +1,27 @@
+{{- range .Values.persistentVolumeClaim }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}
+#  annotations:
+#    helm.sh/resource-policy: keep
+
+  {{- if .labels }}
+  labels:
+    {{- toYaml .labels | nindent 4 }}
+  {{- end }}
+
+
+spec:
+  accessModes:
+    {{- range .accessModes }}
+    - {{ . | default "ReadWriteMany" }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .capacity}}
+  storageClassName: {{ .storageClass}}
+  volumeName: {{ .volumeName }}
+
+{{- end }}

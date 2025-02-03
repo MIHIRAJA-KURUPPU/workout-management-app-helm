@@ -1,0 +1,19 @@
+{{- range .Values.configMap }}
+---
+
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ $.Release.Name }}-{{.name}}-configmap  
+
+  {{- if .labels }}
+  labels:
+    {{- toYaml .labels | nindent 4 }}
+  {{- end }}
+
+data:
+  {{ .user.userKey }}: {{ .user.userName }}
+  {{ .db.dbKey }}: {{ .db.dbName }}
+
+{{- end }}

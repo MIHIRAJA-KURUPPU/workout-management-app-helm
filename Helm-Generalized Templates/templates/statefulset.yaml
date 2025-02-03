@@ -1,0 +1,60 @@
+{{- range .Values.statefulset }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.name}}-statefulset
+
+  {{- if .labels }}
+  labels:
+    {{- toYaml .labels | nindent 4 }}
+  {{- end }}
+
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    {{- if .selectorLabels }}
+    matchLabels:
+      {{- toYaml .selectorLabels | nindent 6 }}
+    {{- end }}
+  template:
+    metadata:
+      {{- if .selectorLabels }}
+      labels:
+        {{- toYaml .selectorLabels | nindent 8 }}
+      {{- end }}
+    spec:
+      containers:
+        - name: {{.name}}
+          image: {{.image.repository }}:{{ .imagetag }}
+          env:
+            - name: {{ index $.Values.configMap 0 "user" "userKey" }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Release.Name }}-{{ index $.Values.configMap 0 "name" }}-configmap
+                  key: {{ index $.Values.configMap 0 "user" "userKey" }}
+            - name: {{ index $.Values.secret 0 "key" }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Release.Name }}-{{ index $.Values.secret 0 "name" }}-secret
+                  key: {{ index $.Values.secret 0 "key" }}
+            - name: {{ index $.Values.configMap 0 "db" "dbKey" }}
+              valueFrom:
+                configMapKeyRef:
+                  name:  {{ $.Release.Name }}-{{ index $.Values.configMap 0 "name" }}-configmap
+                  key: {{ index $.Values.configMap 0 "db" "dbKey" }}
+          volumeMounts:
+            - name: {{ .volume.name }}
+              mountPath: {{ .volume.mountPath }}
+
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .volume.name }}
+      spec:
+        accessModes:
+          - {{ .volume.accessMode }}
+        resources:
+          requests:
+            storage: {{ .volume.size }}
+        storageClassName: {{ .volume.storageClass }}
+{{- end }}
