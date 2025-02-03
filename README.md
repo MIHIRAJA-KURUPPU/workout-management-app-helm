@@ -37,8 +37,8 @@ sudo su -
 The repository includes the following YAML files as templates:
 - `deployment.yaml`
 - `statefulset.yaml`
-- `persistent-volume-claims.yaml`
-- `persistent-volumes.yaml`
+- `persistent-volume-claim.yaml`
+- `persistent-volume.yaml`
 - `configmap.yaml`
 - `service.yaml`
 - `secret.yaml`
@@ -73,3 +73,16 @@ helm upgrade --install workout-management-app . \
 The --create-namespace flag will ensure that the namespace workout-app-ns is created if it does not already exist.
 This command will install the workout-app release or upgrade it if it's already installed.
 
+For running the more generalized version use the following command.
+```bash
+helm upgrade --install workout-management-app . \
+  --namespace workout-app-ns  \
+  --create-namespace  \
+  --set-string configMap[0].user.userName="<your-postgres-username>"  \
+  --set-string configMap[0].db.dbName="<your-database-name>"  \
+  --set-string secret[0].value="<your-postgres-root-password>"  \
+  --set-string secret[1].value="<your-postgres-user-password>"  \
+  -f values.yaml
+```
+
+Note: In this case use user-password  as same as root-password.
